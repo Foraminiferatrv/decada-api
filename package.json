@@ -4,8 +4,17 @@
   "description": "Back-end api for the Decada",
   "main": "index.js",
   "scripts": {
+    "start": "tsc -p tsconfig.json && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "foraminifera",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^4.17.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.4"
+  }
 }
