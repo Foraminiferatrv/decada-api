@@ -10,7 +10,7 @@ const app = (0, fastify_1.default)({
 app.get("/", (req, res) => {
     res.send({ hello: "world" });
 });
-app.listen({ port: 3000 }, (err) => {
+app.listen({ port: 4000, host: "localhost" }, (err) => {
     if (err) {
         app.log.error(err);
         process.exit(1);

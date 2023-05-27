@@ -2,20 +2,28 @@
   "name": "decada-api",
   "version": "0.0.1",
   "description": "Back-end api for the Decada",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "node index.js",
-    "watch": "tsc -p tsconfig.json && nodemon index.js",
+    "start": "ts-node index.ts",
+    "watch": "nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "foraminifera",
   "license": "ISC",
   "dependencies": {
+    "@fastify/env": "^4.2.0",
+    "@fastify/postgres": "^5.2.0",
+    "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
+    "fastify-plugin": "^4.5.0",
+    "fluent-json-schema": "^4.1.0",
+    "knex": "^2.4.2",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.22"
+    "pg": "^8.11.0"
   },
   "devDependencies": {
-    "@types/node": "^20.1.4"
+    "@types/node": "^20.1.4",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1"
   }
 }
