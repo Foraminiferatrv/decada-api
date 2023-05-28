@@ -1,10 +1,9 @@
 import knex from 'knex'
 
 import fastifyPlugin from 'fastify-plugin'
-import { log } from 'console'
 
 export default fastifyPlugin(
-  async (app, opts = {}, done: any) => {
+  async function (app, opts = {}, done: any) {
     if (!app.db) {
       const db = knex({
         ...opts,
@@ -51,13 +50,10 @@ export default fastifyPlugin(
           app.db.destroy(done)
         }
       })
-      db.raw('select 1+1 as result')
-        .then(() => {
-          // console.log('DB Connected!🌲🌲🌳')
-        })
-        .catch((err) => console.error('ERROR CONNECTING TO DATABASE', err))
+      db.raw('select 1+1 as result').catch((err) =>
+        console.error('ERROR CONNECTING TO DATABASE', err),
+      )
     }
-    // done()
   },
   { name: 'knex-postgres-connector' },
 )
