@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import S from 'fluent-json-schema'
 import fastifyEnv from '@fastify/env'
-import db from './services/db'
+import db from './db/db'
 import userRoutes from './routes/user'
 
 declare module 'fastify' {

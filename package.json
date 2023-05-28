@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node index.ts",
     "watch": "nodemon index.ts",
+    "migrate:latest": "npx knex migrate:latest --knexfile db/knexfile.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "foraminifera",
