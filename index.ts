@@ -1,8 +1,13 @@
 import Fastify from 'fastify'
 import S from 'fluent-json-schema'
 import fastifyEnv from '@fastify/env'
-import db from './db/db'
 import userRoutes from './routes/user.route'
+import dotenv from 'dotenv'
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+
+import db from './db/db'
+
+dotenv.config()
 
 declare module 'fastify' {
   export interface FastifyInstance<> {
@@ -19,12 +24,23 @@ declare module 'fastify' {
   }
 }
 
+const envToLogger: { [env: string]: {} } = {
+  dev: {
+    transport: {
+      target: 'pino-pretty',
+    },
+  },
+  prod: true,
+  test: false,
+}
+
 const app = Fastify({
-  logger: true,
-})
+  logger: process.env.NODE_ENV ? envToLogger[process.env.NODE_ENV] : true,
+  // logger: true,
+}).withTypeProvider<TypeBoxTypeProvider>()
 
 const initialize = async () => {
-  const schema = S.object()
+  const envSchema = S.object()
     .prop('PORT', S.number())
     .prop('DB_HOST', S.string())
     .prop('DB_USER', S.string())
@@ -34,7 +50,7 @@ const initialize = async () => {
     .prop('PG_CONNECTION_STRING', S.string())
     .valueOf()
 
-  app.register(fastifyEnv, { dotenv: true, data: process.env, schema: schema })
+  app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
   await app.after()
 
   app.register(db)
@@ -57,13 +73,11 @@ initialize()
 const listen = async () => {
   try {
     await app.ready()
-    app.listen({ port: app.config.PORT || 4000, host: 'localhost' })
+    app.listen({ port: app.config.PORT || 4000, host: '0.0.0.0' })
   } catch (error) {
     app.log.error(error)
     process.exit(1)
   }
-
-  // console.log(`✨ Server started on http://localhost:${port}/ ✨`)
 }
 
 listen()
