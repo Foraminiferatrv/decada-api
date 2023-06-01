@@ -6,6 +6,9 @@ import dotenv from 'dotenv'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 
 import db from './db/db'
+import type { Knex } from 'knex'
+
+//TODO: Add Swagger
 
 dotenv.config()
 
@@ -20,7 +23,7 @@ declare module 'fastify' {
       DB_PASSWORD: string
       DB_ID: string
     }
-    db: any
+    db: Knex
   }
 }
 

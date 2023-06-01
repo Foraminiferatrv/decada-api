@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import type { FastifyRequest, FastifyReply, RouteHandler } from 'fastify'
-import { TCreateUser } from '../schemas/user.schema'
+import { TCreateUser, TUser } from '../schemas/user.schema'
 
 export const getAllUsers: RouteHandler = async function (_req, res) {
   const users = await this.db('users')
@@ -9,13 +9,11 @@ export const getAllUsers: RouteHandler = async function (_req, res) {
   return res.code(200).send({
     user: await this.db.from('users').select('*'),
   })
-  // if (this.db !== undefined) {
-  //   // console.log(this.db)
-  // }
 }
+
 export const createUser: RouteHandler<{ Body: TCreateUser }> = async function (req, res) {
   const { email, password, username, image } = req.body
-
+  console.log('FROM_ALL_USERS:::::::::::::::::')
   const newUser = {
     id: uuidv4(),
     email,
@@ -24,7 +22,7 @@ export const createUser: RouteHandler<{ Body: TCreateUser }> = async function (r
     image,
   }
 
-  await this.db('users')
+  await this.db<TUser>('users')
     .insert(newUser)
     .catch((err: Error) => {
       res.code(500).send(err)
@@ -33,3 +31,16 @@ export const createUser: RouteHandler<{ Body: TCreateUser }> = async function (r
 
   return res.code(201).send(newUser)
 }
+
+export const getUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {
+  const { userId } = req.params
+  let user = null
+  // console.log(req)
+
+  return this.db<TUser>('users')
+    .where('user_id', userId)
+    .then((user) => res.code(200).send(user))
+    .catch(() => res.code(500).send(new Error('Invalid user id.')))
+}
+
+export const deleteUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {}

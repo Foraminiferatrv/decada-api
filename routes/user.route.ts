@@ -1,14 +1,17 @@
 import type { FastifyInstance } from 'fastify'
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 
-import { userSchema, createUserSchema } from '../schemas/user.schema'
+import { updateUserSchema, createUserSchema } from '../schemas/user.schema'
 
-import { createUser, getAllUsers } from '../controllers/user.controller'
+import { createUser, deleteUser, getAllUsers, getUser } from '../controllers/user.controller'
 
 async function userRoutes(app: FastifyInstance) {
-  app.withTypeProvider<TypeBoxTypeProvider>().get('/', { schema: userSchema, handler: getAllUsers })
+  // app.get('/', { schema: userSchema, handler: getAllUsers })
 
   app.put('/create', { schema: { body: createUserSchema }, handler: createUser })
+
+  app.get('/:userId', { handler: getUser })
+  // app.patch('/:userId', { schema: updateUserSchema, handler: updateUser  })
+  app.delete('/delete/:userId', { handler: deleteUser })
 }
 
 export default userRoutes
