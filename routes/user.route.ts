@@ -5,7 +5,7 @@ import { updateUserSchema, createUserSchema } from '../schemas/user.schema'
 import {
   createUser,
   deleteUser,
-  getAllUsers,
+  // getAllUsers,
   getUser,
   updateUser,
 } from '../controllers/user.controller'

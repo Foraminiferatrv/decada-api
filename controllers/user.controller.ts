@@ -60,7 +60,6 @@ export const updateUser: RouteHandler<{ Body: TUpdateUser; Params: { userId: str
     }
     return await users
       .where('user_id', userId)
-      // .first()
       .update(
         {
           email: email,
@@ -72,8 +71,6 @@ export const updateUser: RouteHandler<{ Body: TUpdateUser; Params: { userId: str
       )
       .then((result) => res.code(200).send(result))
       .catch(() => res.code(500).send(new Error('Internal database error!')))
-
-    console.log(user)
   }
 
 export const deleteUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {
@@ -92,6 +89,6 @@ export const deleteUser: RouteHandler<{ Params: { userId: string } }> = async fu
   return users
     .where('user_id', userId)
     .del()
-    .then(() => res.code(200).send({ resp: 'User has been deleted.' }))
+    .then(() => res.code(200).send({ message: 'User has been deleted.' }))
     .catch(() => res.code(500).send(new Error('Internal database error!')))
 }

@@ -7,7 +7,7 @@ exports.up = function (knex) {
   return knex.schema
     .createTable('plans', (table) => {
       table.uuid('plan_id').unique().primary().notNullable()
-      table.string('name').notNullable()
+      table.string('plan_name').notNullable()
       table.boolean('is_complete').notNullable().defaultTo(false)
 
       table.uuid('user_id').unsigned()
@@ -18,7 +18,7 @@ exports.up = function (knex) {
 
     .createTable('goals', (table) => {
       table.uuid('goal_id').unique().primary().notNullable()
-      table.string('name').notNullable()
+      table.string('goal_name').notNullable()
       table.boolean('is_favorite').notNullable().defaultTo(false)
       table.boolean('is_complete').notNullable().defaultTo(false)
       table.integer('priority').notNullable()
@@ -35,7 +35,7 @@ exports.up = function (knex) {
 
     .createTable('conditions', (table) => {
       table.uuid('condition_id').unique().primary().notNullable()
-      table.string('name').notNullable()
+      table.string('condition_name').notNullable()
       table.boolean('is_complete').notNullable().defaultTo(false)
       table.integer('index').notNullable()
 
@@ -47,7 +47,7 @@ exports.up = function (knex) {
 
     .createTable('obstacles', (table) => {
       table.uuid('obstacle_id').unique().primary().notNullable()
-      table.string('name').notNullable()
+      table.string('obstacle_name').notNullable()
       table.integer('index').notNullable()
       table.boolean('is_complete').notNullable().defaultTo(false)
 
@@ -59,7 +59,7 @@ exports.up = function (knex) {
 
     .createTable('solutions', (table) => {
       table.uuid('solution_id').unique().primary().notNullable()
-      table.string('name').notNullable()
+      table.string('solution_name').notNullable()
       table.integer('index').notNullable()
       table.boolean('is_complete').notNullable().defaultTo(false)
 

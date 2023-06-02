@@ -7,6 +7,7 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 
 import db from './db/db'
 import type { Knex } from 'knex'
+import planRoutes from './routes/plan.route'
 
 //TODO: Add Swagger
 
@@ -62,6 +63,7 @@ const initialize = async () => {
     return { status: 'OK' }
   })
 
+  app.register(planRoutes, { prefix: 'api/users/:userId/plans' })
   app.register(userRoutes, { prefix: 'api/users' })
 }
 
