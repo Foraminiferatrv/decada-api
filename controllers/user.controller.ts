@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import type { FastifyRequest, FastifyReply, RouteHandler } from 'fastify'
-import { TCreateUser, TUser } from '../schemas/user.schema'
+import type { RouteHandler } from 'fastify'
+import type { TCreateUser, TUpdateUser, TUser } from '../schemas/user.schema'
 
 export const getAllUsers: RouteHandler = async function (_req, res) {
   const users = await this.db('users')
@@ -13,34 +13,85 @@ export const getAllUsers: RouteHandler = async function (_req, res) {
 
 export const createUser: RouteHandler<{ Body: TCreateUser }> = async function (req, res) {
   const { email, password, username, image } = req.body
-  console.log('FROM_ALL_USERS:::::::::::::::::')
+
   const newUser = {
-    id: uuidv4(),
+    user_id: uuidv4(),
     email,
     password,
     username,
     image,
   }
 
-  await this.db<TUser>('users')
+  return this.db<TUser>('users')
     .insert(newUser)
+    .then(() => res.code(201).send(newUser))
     .catch((err: Error) => {
       res.code(500).send(err)
-      return
     })
-
-  return res.code(201).send(newUser)
 }
 
 export const getUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {
   const { userId } = req.params
-  let user = null
-  // console.log(req)
-
-  return this.db<TUser>('users')
+  const user = await this.db<TUser>('users')
     .where('user_id', userId)
-    .then((user) => res.code(200).send(user))
-    .catch(() => res.code(500).send(new Error('Invalid user id.')))
+    .first()
+    .catch(() => res.code(500).send(new Error('Internal database error!')))
+
+  if (!user) {
+    return res.code(404).send(new Error("There's no such user."))
+  }
+
+  return res.code(200).send(user)
 }
 
-export const deleteUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {}
+export const updateUser: RouteHandler<{ Body: TUpdateUser; Params: { userId: string } }> =
+  async function (req, res) {
+    const { userId } = req.params
+    const { email, password, username, image } = req.body
+
+    const users = this.db<TUser>('users')
+    const user = users
+      .where('user_id', userId)
+      .first()
+      .catch(() => res.code(500).send(new Error('Internal database error!')))
+
+    if (!user) {
+      return res.code(404).send(new Error("There's no such user."))
+    }
+    return await users
+      .where('user_id', userId)
+      // .first()
+      .update(
+        {
+          email: email,
+          password: password,
+          username: username,
+          image: image,
+        },
+        ['*'],
+      )
+      .then((result) => res.code(200).send(result))
+      .catch(() => res.code(500).send(new Error('Internal database error!')))
+
+    console.log(user)
+  }
+
+export const deleteUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {
+  const { userId } = req.params
+  const users = this.db<TUser>('users')
+
+  const user = await users
+    .where('user_id', userId)
+    .first()
+    .catch(() => res.code(500).send(new Error('Internal database error!')))
+
+  if (!user) {
+    return res.code(404).send(new Error("There's no such user."))
+  }
+
+  return users
+    .where('user_id', userId)
+    .del()
+    .then(() => res.code(200).send({ resp: 'User has been deleted.' }))
+    .catch(() => res.code(500).send(new Error('Internal database error!')))
+}

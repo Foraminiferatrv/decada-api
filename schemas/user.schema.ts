@@ -29,3 +29,4 @@ export const updateUserSchema = Type.Object({
   username: Type.Optional(Type.String()),
   image: Type.Optional(Type.String()),
 })
+export type TUpdateUser = Static<typeof updateUserSchema>
