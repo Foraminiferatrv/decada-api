@@ -21,11 +21,8 @@ exports.up = function (knex) {
       table.string('goal_name').notNullable()
       table.boolean('is_favorite').notNullable().defaultTo(false)
       table.boolean('is_complete').notNullable().defaultTo(false)
-      table.integer('priority').notNullable()
-      table
-        .integer('due_time')
-        .notNullable()
-        .comment('Time for completion the task in hours (24h = 1day).')
+      table.integer('priority')
+      table.integer('due_time').comment('Time for completion the task in hours (24h = 1day).')
 
       table.uuid('plan_id').unsigned()
       table.foreign('plan_id').references('plans.plan_id').onDelete('CASCADE').onUpdate('CASCADE')

@@ -43,7 +43,6 @@ export default fastifyPlugin(
       })
 
       app.decorate('db', db)
-      // app.register(db)
 
       app.addHook('onClose', (app, done) => {
         if (app.db === db) {
