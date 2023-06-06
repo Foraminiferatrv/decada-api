@@ -1,15 +1,17 @@
 import Fastify from 'fastify'
 import S from 'fluent-json-schema'
 import fastifyEnv from '@fastify/env'
-import userRoutes from './routes/user.route'
+import userRoutes from './routes/user.routes'
 import dotenv from 'dotenv'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 
 import db from './db/db'
 import type { Knex } from 'knex'
-import planRoutes from './routes/plan.route'
-import goalRoutes from './routes/goal.route'
-import conditionRoutes from './routes/condition.route'
+import planRoutes from './routes/plan.routes'
+import goalRoutes from './routes/goal.routes'
+import conditionRoutes from './routes/condition.routes'
+import solutionRoutes from './routes/solution.routes'
+import obstacleRoutes from './routes/obstacle.routes'
 
 //TODO: Add Swagger
 
@@ -42,7 +44,6 @@ const envToLogger: { [env: string]: {} } = {
 
 const app = Fastify({
   logger: process.env.NODE_ENV ? envToLogger[process.env.NODE_ENV] : true,
-  // logger: true,
 }).withTypeProvider<TypeBoxTypeProvider>()
 
 const initialize = async () => {
@@ -61,23 +62,31 @@ const initialize = async () => {
 
   app.register(db)
 
+  //healthcheck
   app.get('/healthcheck', () => {
     return { status: 'OK' }
   })
 
-  app.register(conditionRoutes, { prefix: 'api/users/:userId/plans/:planId/goals/:goalId/conditions' })
+  //goal routes
+  app.register(obstacleRoutes, {
+    prefix: 'api/users/:userId/plans/:planId/goals/:goalId/obstacles',
+  })
+  app.register(solutionRoutes, {
+    prefix: 'api/users/:userId/plans/:planId/goals/:goalId/solutions',
+  })
+  app.register(conditionRoutes, {
+    prefix: 'api/users/:userId/plans/:planId/goals/:goalId/conditions',
+  })
   app.register(goalRoutes, { prefix: 'api/users/:userId/plans/:planId/goals' })
+
+  //plan routes
   app.register(planRoutes, { prefix: 'api/users/:userId/plans' })
+
+  //user routes
   app.register(userRoutes, { prefix: 'api/users' })
 }
 
 initialize()
-
-// fastify.register(autoLoad, {
-// dir: join(__dirname, 'routes'),
-//   dirNameRoutePrefix: false,
-//   options: Object.assign({}, opts),
-// })
 
 const listen = async () => {
   try {
