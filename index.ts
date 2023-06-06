@@ -9,6 +9,7 @@ import db from './db/db'
 import type { Knex } from 'knex'
 import planRoutes from './routes/plan.route'
 import goalRoutes from './routes/goal.route'
+import conditionRoutes from './routes/condition.route'
 
 //TODO: Add Swagger
 
@@ -64,6 +65,7 @@ const initialize = async () => {
     return { status: 'OK' }
   })
 
+  app.register(conditionRoutes, { prefix: 'api/users/:userId/plans/:planId/goals/:goalId/conditions' })
   app.register(goalRoutes, { prefix: 'api/users/:userId/plans/:planId/goals' })
   app.register(planRoutes, { prefix: 'api/users/:userId/plans' })
   app.register(userRoutes, { prefix: 'api/users' })
