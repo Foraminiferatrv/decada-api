@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 
-import { updateUserSchema, createUserSchema } from '../schemas/user.schema'
+import { updateUserSchema, registerUserSchema } from '../schemas/user.schema'
 
 import {
-  createUser,
+  registerUser,
   deleteUser,
   // getAllUsers,
   getUser,
@@ -12,7 +12,7 @@ import {
 
 async function userRoutes(app: FastifyInstance) {
   // app.get('/', { schema: userSchema, handler: getAllUsers })
-  app.put('/create', { schema: { body: createUserSchema }, handler: createUser })
+  app.put('/register', { schema: { body: registerUserSchema }, handler: registerUser })
   app.get('/:userId', { handler: getUser })
   app.patch('/:userId', { schema: { body: updateUserSchema }, handler: updateUser })
   app.delete('/:userId', { handler: deleteUser })

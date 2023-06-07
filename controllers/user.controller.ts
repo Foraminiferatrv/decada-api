@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import type { RouteHandler } from 'fastify'
-import type { TCreateUser, TUpdateUser, TUser } from '../schemas/user.schema'
+import type { TRegisterUser, TUpdateUser, TUser } from '../schemas/user.schema'
 
 export const getAllUsers: RouteHandler = async function (_req, res) {
   const users = await this.db('users')
@@ -11,20 +11,29 @@ export const getAllUsers: RouteHandler = async function (_req, res) {
   })
 }
 
-export const createUser: RouteHandler<{ Body: TCreateUser }> = async function (req, res) {
+export const registerUser: RouteHandler<{ Body: TRegisterUser }> = async function (req, res) {
   const { email, password, username, image } = req.body
+
+  const hashedPassword = await this.hashGenerate(password)
 
   const newUser = {
     user_id: uuidv4(),
-    email,
-    password,
-    username,
-    image,
+    email: email,
+    password: hashedPassword,
+    username: username,
+    image: image,
   }
 
-  return this.db<TUser>('users')
-    .insert(newUser)
-    .then(() => res.code(201).send(newUser))
+  const users = this.db<TUser>('users')
+
+  const targetUser = await users.where({ email: email }).first()
+  if (targetUser) {
+    return res.code(409).send(new Error('User already exists.'))
+  }
+  return users
+  .insert(newUser)
+  //TODO: return session here
+  .then(() => res.code(201).send(newUser.user_id))
     .catch((err: Error) => {
       res.code(500).send(err)
     })

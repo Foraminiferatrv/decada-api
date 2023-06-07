@@ -4,6 +4,8 @@ import fastifyEnv from '@fastify/env'
 import userRoutes from './routes/user.routes'
 import dotenv from 'dotenv'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import { Type, Static } from '@sinclair/typebox'
+import cors from '@fastify/cors'
 
 import db from './db/db'
 import type { Knex } from 'knex'
@@ -12,6 +14,8 @@ import goalRoutes from './routes/goal.routes'
 import conditionRoutes from './routes/condition.routes'
 import solutionRoutes from './routes/solution.routes'
 import obstacleRoutes from './routes/obstacle.routes'
+import authRoutes from './routes/auth.routes'
+import hashGenerator from './plugins/utils/hashGenerator'
 
 //TODO: Add Swagger
 
@@ -20,6 +24,8 @@ dotenv.config()
 declare module 'fastify' {
   export interface FastifyInstance<> {
     config: {
+      PSWRD_SALT: string
+      SESSION_SECRET: string
       PORT: number
       PG_CONNECTION_STRING: string
       DB_HOST: string
@@ -47,20 +53,29 @@ const app = Fastify({
 }).withTypeProvider<TypeBoxTypeProvider>()
 
 const initialize = async () => {
-  const envSchema = S.object()
-    .prop('PORT', S.number())
-    .prop('DB_HOST', S.string())
-    .prop('DB_USER', S.string())
-    .prop('DB_PORT', S.number())
-    .prop('DB_PASSWORD', S.string())
-    .prop('DB_ID', S.string())
-    .prop('PG_CONNECTION_STRING', S.string())
-    .valueOf()
+  const envSchema = Type.Object({
+    NODE_ENV: Type.String(),
+    PSWRD_SALT: Type.String(),
+    SESSION_SECRET: Type.String(),
+    PG_CONNECTION_STRING: Type.String(),
+    DB_HOST: Type.String(),
+    DB_USER: Type.String(),
+    DB_ID: Type.String(),
+    DB_PASSWORD: Type.String(),
+    DB_PORT: Type.Number(),
+  })
 
   app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
   await app.after()
 
+  app.register(cors, {
+    // put your options here
+  })
+  await app.after()
+
+  //register plugins
   app.register(db)
+  app.register(hashGenerator)
 
   //healthcheck
   app.get('/healthcheck', () => {
@@ -68,6 +83,10 @@ const initialize = async () => {
   })
 
   //goal routes
+  app.register(authRoutes, {
+    prefix: 'api/auth',
+  })
+
   app.register(obstacleRoutes, {
     prefix: 'api/users/:userId/plans/:planId/goals/:goalId/obstacles',
   })
