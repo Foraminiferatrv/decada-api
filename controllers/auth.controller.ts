@@ -6,14 +6,14 @@ export const loginUser: RouteHandler<{ Body: TLogin }> = async function (req, re
   const { email, password } = req.body
 
   const hashedPassword = await this.hashGenerate(password)
-
   const users = this.db<TUser>('users')
-
   const targetUser = await users.where({ email: email }).first()
 
   if (!targetUser || targetUser.password !== hashedPassword) {
     return res.code(401).send(new Error('Invalid e-mail or password.'))
   }
 
-  return res.code(200).send({ ...targetUser, SID: 'SESSION ID' })
+  req.session.user = { user_id: targetUser.user_id }
+  // return res.code(200).send({ ...targetUser, SID: 'SESSION ID' })
+  return res.code(302).redirect(`api/users/${targetUser.user_id}/plans/`)
 }

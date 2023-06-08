@@ -31,9 +31,10 @@ export const registerUser: RouteHandler<{ Body: TRegisterUser }> = async functio
     return res.code(409).send(new Error('User already exists.'))
   }
   return users
-  .insert(newUser)
-  //TODO: return session here
-  .then(() => res.code(201).send(newUser.user_id))
+    .insert(newUser)
+    .then(() => (req.session.user = { user_id: newUser.user_id }))
+    .then(() => res.code(201).send(newUser.user_id))
+    // .then(TODO: Redirect to plans page) 
     .catch((err: Error) => {
       res.code(500).send(err)
     })

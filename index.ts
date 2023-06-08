@@ -1,21 +1,24 @@
 import Fastify from 'fastify'
-import S from 'fluent-json-schema'
 import fastifyEnv from '@fastify/env'
 import userRoutes from './routes/user.routes'
 import dotenv from 'dotenv'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
-import { Type, Static } from '@sinclair/typebox'
+import { Type } from '@sinclair/typebox'
 import cors from '@fastify/cors'
+import fastifyCookie from '@fastify/cookie'
 
 import db from './db/db'
-import type { Knex } from 'knex'
+import hashGenerator from './plugins/utils/hashGenerator'
+import session from './plugins/session'
+
 import planRoutes from './routes/plan.routes'
 import goalRoutes from './routes/goal.routes'
 import conditionRoutes from './routes/condition.routes'
 import solutionRoutes from './routes/solution.routes'
 import obstacleRoutes from './routes/obstacle.routes'
 import authRoutes from './routes/auth.routes'
-import hashGenerator from './plugins/utils/hashGenerator'
+
+import type { Knex } from 'knex'
 
 //TODO: Add Swagger
 
@@ -24,6 +27,7 @@ dotenv.config()
 declare module 'fastify' {
   export interface FastifyInstance<> {
     config: {
+      NODE_ENV: 'dev' | 'prod' | 'test'
       PSWRD_SALT: string
       SESSION_SECRET: string
       PORT: number
@@ -65,16 +69,27 @@ const initialize = async () => {
     DB_PORT: Type.Number(),
   })
 
+  //Register plugins
   app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
   await app.after()
 
   app.register(cors, {
     // put your options here
   })
+  // await app.after()
+
+  app.register(fastifyCookie, {
+    // put your options here
+  })
+  // await app.after()
+
+  //Register custom plugins
+  app.register(db)
+  // await app.after()
+
+  app.register(session)
   await app.after()
 
-  //register plugins
-  app.register(db)
   app.register(hashGenerator)
 
   //healthcheck
