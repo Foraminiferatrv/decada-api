@@ -6,10 +6,12 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import { Type } from '@sinclair/typebox'
 import cors from '@fastify/cors'
 import fastifyCookie from '@fastify/cookie'
+import fastifyAuth from '@fastify/auth'
 
 import db from './db/db'
 import hashGenerator from './plugins/utils/hashGenerator'
 import session from './plugins/session'
+import auth from './plugins/auth'
 
 import planRoutes from './routes/plan.routes'
 import goalRoutes from './routes/goal.routes'
@@ -69,26 +71,25 @@ const initialize = async () => {
     DB_PORT: Type.Number(),
   })
 
-  //Register plugins
+  //---Register plugins---
   app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
-  await app.after()
 
   app.register(cors, {
     // put your options here
   })
-  // await app.after()
 
   app.register(fastifyCookie, {
     // put your options here
+    // hook: false,
   })
-  // await app.after()
+
+  app.register(fastifyAuth)
 
   //Register custom plugins
   app.register(db)
-  // await app.after()
-
+  app.register(auth)
   app.register(session)
-  await app.after()
+  // await app.after()
 
   app.register(hashGenerator)
 
@@ -97,7 +98,7 @@ const initialize = async () => {
     return { status: 'OK' }
   })
 
-  //goal routes
+  //---Goal routes---
   app.register(authRoutes, {
     prefix: 'api/auth',
   })

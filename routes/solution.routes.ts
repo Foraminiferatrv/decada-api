@@ -17,12 +17,24 @@ import {
 } from '../controllers/solution.controller'
 
 async function solutionRoutes(app: FastifyInstance) {
-  app.get('/', { schema: solutionSchema, handler: getAllSolutions })
-  app.put('/create', { schema: { body: createSolutionSchema }, handler: createSolution })
+  app.get('/', { schema: solutionSchema, onRequest: app.verifySession, handler: getAllSolutions })
+  app.put('/create', {
+    schema: { body: createSolutionSchema },
+    onRequest: app.verifySession,
+    handler: createSolution,
+  })
   app.get('/:solutionId', { handler: getSolution })
-  app.patch('/:solutionId', { schema: { body: updateSolutionSchema }, handler: updateSolution })
-  app.patch('/', { schema: { body: updateSolutionsArraySchema }, handler: updateAllSolutions })
-  app.delete('/:solutionId', { handler: deleteSolution })
+  app.patch('/:solutionId', {
+    schema: { body: updateSolutionSchema },
+    onRequest: app.verifySession,
+    handler: updateSolution,
+  })
+  app.patch('/', {
+    schema: { body: updateSolutionsArraySchema },
+    onRequest: app.verifySession,
+    handler: updateAllSolutions,
+  })
+  app.delete('/:solutionId', { onRequest: app.verifySession, handler: deleteSolution })
 }
 
 export default solutionRoutes

@@ -13,7 +13,6 @@ export const loginUser: RouteHandler<{ Body: TLogin }> = async function (req, re
     return res.code(401).send(new Error('Invalid e-mail or password.'))
   }
 
-  req.session.user = { user_id: targetUser.user_id }
-  // return res.code(200).send({ ...targetUser, SID: 'SESSION ID' })
-  return res.code(302).redirect(`api/users/${targetUser.user_id}/plans/`)
+  req.session.set('authenticated', true)
+  return res.code(200).send(targetUser)
 }

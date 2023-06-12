@@ -30,14 +30,16 @@ export const registerUser: RouteHandler<{ Body: TRegisterUser }> = async functio
   if (targetUser) {
     return res.code(409).send(new Error('User already exists.'))
   }
-  return users
-    .insert(newUser)
-    .then(() => (req.session.user = { user_id: newUser.user_id }))
-    .then(() => res.code(201).send(newUser.user_id))
-    // .then(TODO: Redirect to plans page) 
-    .catch((err: Error) => {
-      res.code(500).send(err)
-    })
+  return (
+    users
+      .insert(newUser)
+      .then(() => req.session.set('authenticated', true))
+      .then(() => res.code(201).send(newUser.user_id))
+      // .then(TODO: Redirect to plans page)
+      .catch((err: Error) => {
+        res.code(500).send(err)
+      })
+  )
 }
 
 export const getUser: RouteHandler<{ Params: { userId: string } }> = async function (req, res) {
