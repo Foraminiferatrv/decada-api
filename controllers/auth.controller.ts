@@ -14,5 +14,12 @@ export const loginUser: RouteHandler<{ Body: TLogin }> = async function (req, re
   }
 
   req.session.set('authenticated', true)
-  return res.code(200).send(targetUser)
+  return res
+    .code(200)
+    .send({
+      user_id: targetUser.user_id,
+      email: targetUser.email,
+      username: targetUser.username,
+      image: targetUser.image,
+    })
 }

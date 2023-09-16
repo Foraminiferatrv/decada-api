@@ -75,7 +75,9 @@ const initialize = async () => {
   app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
 
   app.register(cors, {
-    // put your options here
+    origin: 'http://localhost:5173',
+    methods: ['PUT', 'POST', 'DELETE', 'GET', 'PATCH'],
+    credentials: true,
   })
 
   app.register(fastifyCookie, {
@@ -94,7 +96,7 @@ const initialize = async () => {
   app.register(hashGenerator)
 
   //healthcheck
-  app.get('/healthcheck', () => {
+  app.get('/api/healthcheck', () => {
     return { status: 'OK' }
   })
 

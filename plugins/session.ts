@@ -23,7 +23,8 @@ export default fastifyPlugin(async (app) => {
     secret: app.config.SESSION_SECRET,
     cookie: {
       maxAge: 600000,
-      secure: app.config.NODE_ENV === 'prod',
+      // secure: app.config.NODE_ENV === 'prod',
+      secure: true,
       sameSite: 'none',
       // path: '/api/auth',
     },

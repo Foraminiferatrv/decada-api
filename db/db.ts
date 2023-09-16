@@ -14,7 +14,8 @@ export default fastifyPlugin(
           user: app.config.DB_USER,
           password: app.config.DB_PASSWORD,
           database: app.config.DB_ID,
-          ssl: true,
+          ssl: { rejectUnauthorized: false },
+
           ...opts.connection,
         },
         pool: {
