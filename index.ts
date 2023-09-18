@@ -7,6 +7,7 @@ import { Type } from '@sinclair/typebox'
 import cors from '@fastify/cors'
 import fastifyCookie from '@fastify/cookie'
 import fastifyAuth from '@fastify/auth'
+import fs from 'fs'
 
 import db from './db/db'
 import hashGenerator from './plugins/utils/hashGenerator'
@@ -55,6 +56,10 @@ const envToLogger: { [env: string]: {} } = {
 }
 
 const app = Fastify({
+  // https: {
+  //   key: fs.readFileSync('./certificates/server.key'),
+  //   cert: fs.readFileSync('./certificates/server.crt'),
+  // },
   logger: process.env.NODE_ENV ? envToLogger[process.env.NODE_ENV] : true,
 }).withTypeProvider<TypeBoxTypeProvider>()
 
@@ -75,7 +80,7 @@ const initialize = async () => {
   app.register(fastifyEnv, { dotenv: true, data: process.env, schema: envSchema })
 
   app.register(cors, {
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
     methods: ['PUT', 'POST', 'DELETE', 'GET', 'PATCH'],
     credentials: true,
   })

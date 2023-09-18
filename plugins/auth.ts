@@ -12,20 +12,26 @@ declare module 'fastify' {
 export default fastifyPlugin(async (app) => {
   app.decorate(
     'verifySession',
-    async (req: FastifyRequest, res: FastifyReply, done: HookHandlerDoneFunction) => {
-      const sessionId = req.session.sessionId
+    async (
+      req: FastifyRequest<{ Params: { userId: string } }>,
+      res: FastifyReply,
+      done: HookHandlerDoneFunction,
+    ) => {
+      const reqSessionId = req.session.sessionId
 
-      if (!sessionId) return res.code(401).send(new Error('Unauthorized!'))
+      if (!reqSessionId) return res.code(401).send(new Error('Unauthorized!'))
 
       const storedSession = await app
-        .db<{ sid: string; sess: { authenticated: boolean }; expired: string }>('sessions')
-        .where({ sid: sessionId })
+        .db<{ sid: string; sess: { user_id: string; isAuthenticated: boolean }; expired: string }>(
+          'sessions',
+        )
+        .where({ sid: reqSessionId })
         .first()
         .catch(() => res.code(500).send(new Error('Internal database error!')))
 
-      const isAuthenticated = storedSession?.sess.authenticated
-
-      if (!isAuthenticated) {
+      const isAuthorized = storedSession?.sess.user_id === req.session.user_id
+      console.log({ storedSess: storedSession?.sess.user_id, reqUserId: req.session.user_id })
+      if (!storedSession || !isAuthorized) {
         return res.code(401).send(new Error('Unauthorized!'))
       }
     },

@@ -13,13 +13,25 @@ export const loginUser: RouteHandler<{ Body: TLogin }> = async function (req, re
     return res.code(401).send(new Error('Invalid e-mail or password.'))
   }
 
-  req.session.set('authenticated', true)
-  return res
-    .code(200)
-    .send({
-      user_id: targetUser.user_id,
-      email: targetUser.email,
-      username: targetUser.username,
-      image: targetUser.image,
-    })
+  req.session.set('user_id', targetUser.user_id)
+  req.session.set('is_authenticated', true)
+
+  return res.code(200).send({
+    user_id: targetUser.user_id,
+    email: targetUser.email,
+    username: targetUser.username,
+    image: targetUser.image,
+  })
+}
+
+export const logoutUser: RouteHandler = async (req, res) => {
+  console.log(req.session.sessionId)
+
+  return req.session.destroy((error) => {
+    if (error) {
+      return res.code(500).send(error)
+    } else {
+      return res.code(200).send('Logged out')
+    }
+  })
 }

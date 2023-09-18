@@ -33,7 +33,10 @@ export const registerUser: RouteHandler<{ Body: TRegisterUser }> = async functio
   return (
     users
       .insert(newUser)
-      .then(() => req.session.set('authenticated', true))
+      .then(() => {
+        req.session.set('user_id', newUser.user_id)
+        req.session.set('is_authenticated', true)
+      })
       .then(() => res.code(201).send(newUser.user_id))
       // .then(TODO: Redirect to plans page)
       .catch((err: Error) => {

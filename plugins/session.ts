@@ -5,8 +5,8 @@ import connectSessionKnex from 'connect-session-knex'
 
 declare module 'fastify' {
   interface Session {
-    // user: { user_id: string }
-    authenticated: boolean
+    user_id: string
+    is_authenticated: boolean
   }
 }
 
@@ -21,12 +21,14 @@ export default fastifyPlugin(async (app) => {
 
   app.register(fastifySession, {
     secret: app.config.SESSION_SECRET,
+    saveUninitialized: false,
     cookie: {
       maxAge: 600000,
-      // secure: app.config.NODE_ENV === 'prod',
-      secure: true,
-      sameSite: 'none',
-      // path: '/api/auth',
+      secure: app.config.NODE_ENV === 'prod',
+      // secure: false,
+      domain: '127.0.0.1',
+      httpOnly: false,
+      path: '/',
     },
     rolling: false,
     store: sessionStore,
